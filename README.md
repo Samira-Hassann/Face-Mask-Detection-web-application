@@ -7,6 +7,8 @@ This application uses a custom-trained YOLOv8 Nano model trained on the Mask-Wea
 * **mask** (Green Bounding Box)
 * **no-mask** (Red Bounding Box)
 
+🔗 **Kaggle Notebook:** [Face Mask Detection YOLOv8 Notebook](https://www.kaggle.com/code/samoura/mask-detection/edit/run/349773664)
+
 ## 📁 Repository Structure
 ```text
 .
