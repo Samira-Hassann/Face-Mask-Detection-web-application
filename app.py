@@ -9,153 +9,136 @@ st.set_page_config(
     page_title="Face Mask Detection",
     page_icon="😷",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
-# 2. Modern Glassmorphism & Clean CSS Design
+# 2. Minimalist & Clean CSS Design
 st.markdown("""
     <style>
-    /* Main Layout Styling */
+    /* Clean background */
     .stApp {
         background-color: #0f172a;
         color: #f8fafc;
     }
     
-    /* Header Section */
-    .app-header {
+    /* Hide Sidebar Completely */
+    section[data-testid="stSidebar"] {
+        display: none;
+    }
+    
+    /* Modern Header Card */
+    .header-card {
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
         border: 1px solid #334155;
-        padding: 20px 30px;
-        border-radius: 16px;
+        padding: 30px;
+        border-radius: 20px;
         text-align: center;
-        margin-bottom: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     }
-    .app-header h1 {
+    .header-card h1 {
         color: #38bdf8;
-        font-size: 2.2rem;
+        font-size: 2.5rem;
         margin: 0;
-        font-weight: 700;
+        font-weight: 800;
     }
-    .app-header p {
+    .header-card p {
         color: #94a3b8;
-        margin-top: 5px;
-        font-size: 1rem;
+        margin-top: 8px;
+        font-size: 1.1rem;
     }
 
-    /* Sidebar Customization */
-    section[data-testid="stSidebar"] {
-        background-color: #1e293b;
-        border-right: 1px solid #334155;
-    }
-    
-    .sidebar-card {
-        background-color: #0f172a;
-        border: 1px solid #334155;
-        padding: 16px;
-        border-radius: 12px;
-        margin-bottom: 15px;
-    }
-    
-    /* Image Display Container */
-    .img-container {
-        border: 1px solid #334155;
-        background-color: #1e293b;
-        padding: 15px;
-        border-radius: 12px;
-        text-align: center;
-    }
-
-    /* Button Customization */
+    /* Minimalist Action Button */
     .stButton>button {
         width: 100%;
-        background: linear-gradient(90deg, #0284c7 0%, #0369a1 100%);
-        color: white;
-        font-weight: 600;
-        border-radius: 8px;
-        padding: 12px;
+        background: linear-gradient(90deg, #38bdf8 0%, #0284c7 100%);
+        color: #0f172a;
+        font-weight: 700;
+        font-size: 1.1rem;
+        border-radius: 12px;
+        padding: 14px;
         border: none;
-        transition: all 0.2s ease-in-out;
+        transition: all 0.3s ease;
     }
     .stButton>button:hover {
-        background: linear-gradient(90deg, #0369a1 0%, #075985 100%);
-        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+        background: linear-gradient(90deg, #7dd3fc 0%, #0369a1 100%);
+        box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4);
+        color: #0f172a;
+    }
+    
+    /* Metrics Customization */
+    div[data-testid="stMetricValue"] {
+        color: #38bdf8;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# 3. Model Loader Function
+# 3. Model Loader
 @st.cache_resource
 def load_model():
     return YOLO("best.pt")
 
-# 4. Sidebar / Control Panel
-with st.sidebar:
-    st.markdown("<h2 style='text-align: center; color: #38bdf8;'>⚙️ Control Panel</h2>", unsafe_allow_html=True)
-    st.markdown("---")
-    
-    # Model Status Box
-    st.markdown("<div class='sidebar-card'>", unsafe_allow_html=True)
-    st.markdown("<h4 style='margin:0; color:#f8fafc;'>Model Status</h4>", unsafe_allow_html=True)
-    try:
-        model = load_model()
-        st.markdown("<p style='color:#4ade80; margin:5px 0 0 0;'>🟢 Loaded Successfully</p>", unsafe_allow_html=True)
-    except Exception as e:
-        st.markdown("<p style='color:#f87171; margin:5px 0 0 0;'>🔴 Model File Missing</p>", unsafe_allow_html=True)
-        model = None
-    st.markdown("</div>", unsafe_allow_html=True)
+try:
+    model = load_model()
+except Exception:
+    model = None
 
-    # Instructions Box
-    st.markdown("<div class='sidebar-card'>", unsafe_allow_html=True)
-    st.markdown("<h4 style='margin:0 0 8px 0; color:#f8fafc;'>Quick Guide</h4>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size: 0.85rem; color:#94a3b8; margin:0;'>1. Upload an image file.<br>2. Preview image in workspace.<br>3. Click <b>Run Detection</b> for analysis.</p>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# 5. Header Section
+# 4. Main Header
 st.markdown("""
-    <div class="app-header">
-        <h1>😷 Face Mask Detection System</h1>
-        <p>Automated visual inspection using deep learning technology</p>
+    <div class="header-card">
+        <h1>😷 AI Face Mask Detector</h1>
+        <p>Smart real-time mask detection using deep learning</p>
     </div>
 """, unsafe_allow_html=True)
 
-# 6. Workspace Area
-if model is not None:
-    uploaded_file = st.file_uploader("Upload Image File", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
+if model is None:
+    st.error("⚠️ Model file 'best.pt' not found. Please ensure it is in the project folder.")
+else:
+    # File Uploader
+    uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
 
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
         
-        # Grid layout for side-by-side view without whitespace
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.markdown("<h3 style='font-size:1.1rem; color:#cbd5e1;'>Original Image</h3>", unsafe_allow_html=True)
-            st.image(image, use_container_width=True)
-            
-        with col2:
-            st.markdown("<h3 style='font-size:1.1rem; color:#cbd5e1;'>Detection Workspace</h3>", unsafe_allow_html=True)
-            detection_container = st.empty()
-            detection_container.image(image, caption="Awaiting Detection...", use_container_width=True)
-
+        # Action Button directly above or below
         st.markdown("<br>", unsafe_allow_html=True)
-        
-        # Action Button
-        if st.button("Run Mask Detection"):
-            with st.spinner("Processing image via YOLO..."):
+        detect_btn = st.button("✨ Detect Face Mask")
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        if detect_btn:
+            with st.spinner("Analyzing image..."):
                 img_array = np.array(image.convert("RGB"))
                 results = model(img_array)
                 res_plotted = results[0].plot()
+
+                # Display Side-by-Side Results
+                col1, col2 = st.columns(2)
                 
-                # Replace the image container directly with the result
-                detection_container.image(res_plotted, caption="Processed Output", use_container_width=True)
-                
-                # Metrics Row
+                with col1:
+                    st.markdown("<h4 style='color:#94a3b8; text-align:center;'>Original Image</h4>", unsafe_allow_html=True)
+                    st.image(image, use_container_width=True)
+                    
+                with col2:
+                    st.markdown("<h4 style='color:#38bdf8; text-align:center;'>Detection Result</h4>", unsafe_allow_html=True)
+                    st.image(res_plotted, use_container_width=True)
+
+                # Metrics Section
                 boxes = results[0].boxes
                 total_faces = len(boxes) if boxes is not None else 0
                 
                 st.markdown("---")
                 m1, m2 = st.columns(2)
-                m1.metric("Total Detected Faces", total_faces)
-                m2.metric("Detection State", "Success" if total_faces > 0 else "No Faces Identified")
+                m1.metric("Total Faces Detected", total_faces)
+                m2.metric("Status", "Complete" if total_faces > 0 else "No Faces Found")
+        else:
+            # Display only original image nicely centered before clicking detect
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                st.markdown("<h4 style='color:#94a3b8; text-align:center;'>Uploaded Image</h4>", unsafe_allow_html=True)
+                st.image(image, use_container_width=True)
     else:
-        st.info("Please upload an image file using the upload box above to begin.")
+        st.markdown("""
+            <div style='text-align: center; padding: 40px; border: 2px dashed #334155; border-radius: 16px; color: #64748b;'>
+                <p style='font-size: 1.2rem; margin: 0;'>📥 Drag and drop or browse an image above to start</p>
+            </div>
+        """, unsafe_allow_html=True)
