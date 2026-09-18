@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 from ultralytics import YOLO
 
-# 1. Page Configuration
+# 1. Page Configuration (Centered & Clean)
 st.set_page_config(
     page_title="Face Mask Detection",
     page_icon="😷",
@@ -12,68 +12,62 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. Minimalist & Clean CSS Design
+# 2. Minimalist & Modern CSS
 st.markdown("""
     <style>
-    /* Clean background */
+    /* Dark Theme Setup */
     .stApp {
         background-color: #0f172a;
         color: #f8fafc;
     }
     
-    /* Hide Sidebar Completely */
+    /* Completely Hide Sidebar */
     section[data-testid="stSidebar"] {
         display: none;
     }
     
-    /* Modern Header Card */
+    /* Header Container */
     .header-card {
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
         border: 1px solid #334155;
-        padding: 30px;
-        border-radius: 20px;
+        padding: 25px;
+        border-radius: 16px;
         text-align: center;
-        margin-bottom: 30px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        margin-bottom: 25px;
     }
     .header-card h1 {
         color: #38bdf8;
-        font-size: 2.5rem;
+        font-size: 2.2rem;
         margin: 0;
-        font-weight: 800;
+        font-weight: 700;
     }
     .header-card p {
         color: #94a3b8;
-        margin-top: 8px;
-        font-size: 1.1rem;
+        margin-top: 6px;
+        font-size: 1rem;
     }
 
-    /* Minimalist Action Button */
+    /* Action Button Styling */
     .stButton>button {
         width: 100%;
         background: linear-gradient(90deg, #38bdf8 0%, #0284c7 100%);
         color: #0f172a;
         font-weight: 700;
-        font-size: 1.1rem;
-        border-radius: 12px;
-        padding: 14px;
+        font-size: 1rem;
+        border-radius: 10px;
+        padding: 12px;
         border: none;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
     }
     .stButton>button:hover {
         background: linear-gradient(90deg, #7dd3fc 0%, #0369a1 100%);
-        box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4);
         color: #0f172a;
-    }
-    
-    /* Metrics Customization */
-    div[data-testid="stMetricValue"] {
-        color: #38bdf8;
+        box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
     }
     </style>
 """, unsafe_allow_html=True)
 
-# 3. Model Loader
+# 3. Load YOLO Model
 @st.cache_resource
 def load_model():
     return YOLO("best.pt")
@@ -86,59 +80,49 @@ except Exception:
 # 4. Main Header
 st.markdown("""
     <div class="header-card">
-        <h1>😷 AI Face Mask Detector</h1>
-        <p>Smart real-time mask detection using deep learning</p>
+        <h1>😷 Face Mask Detection System</h1>
+        <p>Upload an image to identify face mask compliance</p>
     </div>
 """, unsafe_allow_html=True)
 
+# 5. Main Content Area
 if model is None:
-    st.error("⚠️ Model file 'best.pt' not found. Please ensure it is in the project folder.")
+    st.error("⚠️ Model file 'best.pt' was not found. Please place it in the same project directory.")
 else:
-    # File Uploader
     uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
 
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
         
-        # Action Button directly above or below
-        st.markdown("<br>", unsafe_allow_html=True)
-        detect_btn = st.button("✨ Detect Face Mask")
-        st.markdown("<br>", unsafe_allow_html=True)
+        # Display side-by-side columns
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("<h4 style='color:#cbd5e1;'>Original Image</h4>", unsafe_allow_html=True)
+            st.image(image, use_container_width=True)
+            
+        with col2:
+            st.markdown("<h4 style='color:#38bdf8;'>Detection Result</h4>", unsafe_allow_html=True)
+            result_placeholder = st.empty()
+            # Shows original image until user clicks detect
+            result_placeholder.image(image, caption="Ready for detection", use_container_width=True)
 
-        if detect_btn:
-            with st.spinner("Analyzing image..."):
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        if st.button("Run Mask Detection"):
+            with st.spinner("Processing image..."):
                 img_array = np.array(image.convert("RGB"))
                 results = model(img_array)
                 res_plotted = results[0].plot()
 
-                # Display Side-by-Side Results
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    st.markdown("<h4 style='color:#94a3b8; text-align:center;'>Original Image</h4>", unsafe_allow_html=True)
-                    st.image(image, use_container_width=True)
-                    
-                with col2:
-                    st.markdown("<h4 style='color:#38bdf8; text-align:center;'>Detection Result</h4>", unsafe_allow_html=True)
-                    st.image(res_plotted, use_container_width=True)
+                # Update the right side with actual detection results
+                result_placeholder.image(res_plotted, caption="Detection Finished", use_container_width=True)
 
-                # Metrics Section
+                # Simple Summary
                 boxes = results[0].boxes
                 total_faces = len(boxes) if boxes is not None else 0
                 
                 st.markdown("---")
                 m1, m2 = st.columns(2)
                 m1.metric("Total Faces Detected", total_faces)
-                m2.metric("Status", "Complete" if total_faces > 0 else "No Faces Found")
-        else:
-            # Display only original image nicely centered before clicking detect
-            col1, col2, col3 = st.columns([1, 2, 1])
-            with col2:
-                st.markdown("<h4 style='color:#94a3b8; text-align:center;'>Uploaded Image</h4>", unsafe_allow_html=True)
-                st.image(image, use_container_width=True)
-    else:
-        st.markdown("""
-            <div style='text-align: center; padding: 40px; border: 2px dashed #334155; border-radius: 16px; color: #64748b;'>
-                <p style='font-size: 1.2rem; margin: 0;'>📥 Drag and drop or browse an image above to start</p>
-            </div>
-        """, unsafe_allow_html=True)
+                m2.metric("Status", "Complete" if total_faces > 0 else "No Faces Detected")
