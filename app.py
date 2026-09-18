@@ -4,70 +4,87 @@ import numpy as np
 import cv2
 from ultralytics import YOLO
 
-# 1. Page Configuration (Centered & Clean)
+# 1. Configuration & Layout
 st.set_page_config(
-    page_title="Face Mask Detection",
+    page_title="VisionAI - Mask Detection",
     page_icon="😷",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# 2. Minimalist & Modern CSS
+# 2. Modern SaaS UI CSS
 st.markdown("""
     <style>
-    /* Dark Theme Setup */
+    /* Global Styles */
     .stApp {
-        background-color: #0f172a;
-        color: #f8fafc;
+        background-color: #0b0f19;
+        color: #e2e8f0;
+        font-family: 'Inter', sans-serif;
     }
     
-    /* Completely Hide Sidebar */
-    section[data-testid="stSidebar"] {
-        display: none;
+    /* Hide Sidebar & Streamlit Footer */
+    section[data-testid="stSidebar"], footer, header {
+        display: none !important;
     }
     
-    /* Header Container */
-    .header-card {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        border: 1px solid #334155;
-        padding: 25px;
-        border-radius: 16px;
+    /* Hero Header */
+    .hero-section {
         text-align: center;
-        margin-bottom: 25px;
+        padding: 40px 20px 20px 20px;
     }
-    .header-card h1 {
-        color: #38bdf8;
-        font-size: 2.2rem;
-        margin: 0;
-        font-weight: 700;
+    .hero-title {
+        font-size: 2.8rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 8px;
     }
-    .header-card p {
+    .hero-subtitle {
         color: #94a3b8;
-        margin-top: 6px;
+        font-size: 1.1rem;
+        font-weight: 400;
+    }
+    
+    /* Image Display Container Cards */
+    .image-card {
+        background: #161e2e;
+        border: 1px solid #243044;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    .card-title {
         font-size: 1rem;
+        font-weight: 600;
+        color: #94a3b8;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
 
-    /* Action Button Styling */
+    /* Primary Action Button */
     .stButton>button {
         width: 100%;
-        background: linear-gradient(90deg, #38bdf8 0%, #0284c7 100%);
-        color: #0f172a;
+        background: linear-gradient(135deg, #0284c7 0%, #4f46e5 100%);
+        color: #ffffff;
         font-weight: 700;
-        font-size: 1rem;
-        border-radius: 10px;
-        padding: 12px;
+        font-size: 1.1rem;
+        border-radius: 12px;
+        padding: 14px;
         border: none;
-        transition: all 0.2s ease;
+        box-shadow: 0 4px 20px rgba(2, 132, 199, 0.4);
+        transition: all 0.3s ease;
     }
     .stButton>button:hover {
-        background: linear-gradient(90deg, #7dd3fc 0%, #0369a1 100%);
-        color: #0f172a;
-        box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(2, 132, 199, 0.6);
+        color: #ffffff;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# 3. Load YOLO Model
+# 3. Model Loading
 @st.cache_resource
 def load_model():
     return YOLO("best.pt")
@@ -77,52 +94,57 @@ try:
 except Exception:
     model = None
 
-# 4. Main Header
+# 4. Header Section
 st.markdown("""
-    <div class="header-card">
-        <h1>😷 Face Mask Detection System</h1>
-        <p>Upload an image to identify face mask compliance</p>
+    <div class="hero-section">
+        <div class="hero-title">😷 Face Mask Vision AI</div>
+        <div class="hero-subtitle">Automated Mask Detection Platform</div>
     </div>
 """, unsafe_allow_html=True)
 
-# 5. Main Content Area
+# 5. Main Application Logic
 if model is None:
-    st.error("⚠️ Model file 'best.pt' was not found. Please place it in the same project directory.")
+    st.error("⚠️ Model file 'best.pt' not found. Please verify the file path.")
 else:
-    uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
+    # Centered File Uploader Area
+    col_left, col_center, col_right = st.columns([1, 2, 1])
+    with col_center:
+        uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
 
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
         
-        # Display side-by-side columns
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Display Split View (Only when an image is selected)
         col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("<h4 style='color:#cbd5e1;'>Original Image</h4>", unsafe_allow_html=True)
+            st.markdown('<div class="card-title">📷 Original Image</div>', unsafe_allow_html=True)
             st.image(image, use_container_width=True)
             
         with col2:
-            st.markdown("<h4 style='color:#38bdf8;'>Detection Result</h4>", unsafe_allow_html=True)
+            st.markdown('<div class="card-title">🔍 AI Result</div>', unsafe_allow_html=True)
             result_placeholder = st.empty()
-            # Shows original image until user clicks detect
-            result_placeholder.image(image, caption="Ready for detection", use_container_width=True)
+            result_placeholder.image(image, caption="Ready to process", use_container_width=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
         
-        if st.button("Run Mask Detection"):
-            with st.spinner("Processing image..."):
+        # Action Button
+        if st.button("Start Detection"):
+            with st.spinner("Analyzing image features..."):
                 img_array = np.array(image.convert("RGB"))
                 results = model(img_array)
                 res_plotted = results[0].plot()
 
-                # Update the right side with actual detection results
-                result_placeholder.image(res_plotted, caption="Detection Finished", use_container_width=True)
+                # Render Detection Output
+                result_placeholder.image(res_plotted, caption="Analysis Complete", use_container_width=True)
 
-                # Simple Summary
+                # Metrics Summary
                 boxes = results[0].boxes
                 total_faces = len(boxes) if boxes is not None else 0
                 
-                st.markdown("---")
+                st.markdown("<br>", unsafe_allow_html=True)
                 m1, m2 = st.columns(2)
-                m1.metric("Total Faces Detected", total_faces)
-                m2.metric("Status", "Complete" if total_faces > 0 else "No Faces Detected")
+                m1.metric(label="Faces Detected", value=total_faces)
+                m2.metric(label="Processing Status", value="Completed" if total_faces > 0 else "No Targets Found")
