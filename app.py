@@ -6,137 +6,156 @@ from ultralytics import YOLO
 
 # 1. Page Configuration
 st.set_page_config(
-    page_title="Face Mask Detection System",
+    page_title="Face Mask Detection",
     page_icon="😷",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# 2. Custom CSS for Professional UI Design
+# 2. Modern Glassmorphism & Clean CSS Design
 st.markdown("""
     <style>
-    /* Main Background & Fonts */
-    .main {
-        background-color: #f8f9fa;
+    /* Main Layout Styling */
+    .stApp {
+        background-color: #0f172a;
+        color: #f8fafc;
     }
     
-    /* Header Styling */
-    .main-header {
-        background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
-        padding: 24px;
-        border-radius: 12px;
-        color: white;
+    /* Header Section */
+    .app-header {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border: 1px solid #334155;
+        padding: 20px 30px;
+        border-radius: 16px;
         text-align: center;
         margin-bottom: 25px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
-    .main-header h1 {
-        color: white;
+    .app-header h1 {
+        color: #38bdf8;
+        font-size: 2.2rem;
         margin: 0;
         font-weight: 700;
     }
-    .main-header p {
-        color: #e0e0e0;
-        margin-top: 8px;
-        font-size: 1.1rem;
+    .app-header p {
+        color: #94a3b8;
+        margin-top: 5px;
+        font-size: 1rem;
     }
 
-    /* Metric Cards */
-    div[data-testid="stMetricValue"] {
-        font-size: 2rem;
-        font-weight: bold;
+    /* Sidebar Customization */
+    section[data-testid="stSidebar"] {
+        background-color: #1e293b;
+        border-right: 1px solid #334155;
+    }
+    
+    .sidebar-card {
+        background-color: #0f172a;
+        border: 1px solid #334155;
+        padding: 16px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+    }
+    
+    /* Image Display Container */
+    .img-container {
+        border: 1px solid #334155;
+        background-color: #1e293b;
+        padding: 15px;
+        border-radius: 12px;
+        text-align: center;
     }
 
-    /* Custom Button */
+    /* Button Customization */
     .stButton>button {
         width: 100%;
-        background-color: #1e3c72;
+        background: linear-gradient(90deg, #0284c7 0%, #0369a1 100%);
         color: white;
-        font-weight: bold;
+        font-weight: 600;
         border-radius: 8px;
-        padding: 12px 24px;
+        padding: 12px;
         border: none;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease-in-out;
     }
     .stButton>button:hover {
-        background-color: #2a5298;
-        color: white;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        background: linear-gradient(90deg, #0369a1 0%, #075985 100%);
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
     }
     </style>
 """, unsafe_allow_html=True)
 
-# 3. Model Loading Function
+# 3. Model Loader Function
 @st.cache_resource
 def load_model():
     return YOLO("best.pt")
 
-# 4. Sidebar Content
+# 4. Sidebar / Control Panel
 with st.sidebar:
-    st.image("https://img.icons8.com/color/96/000000/facial-recognition.png", width=80)
-    st.title("Control Panel")
+    st.markdown("<h2 style='text-align: center; color: #38bdf8;'>⚙️ Control Panel</h2>", unsafe_allow_html=True)
     st.markdown("---")
     
-    st.subheader("Model Status")
+    # Model Status Box
+    st.markdown("<div class='sidebar-card'>", unsafe_allow_html=True)
+    st.markdown("<h4 style='margin:0; color:#f8fafc;'>Model Status</h4>", unsafe_allow_html=True)
     try:
         model = load_model()
-        st.success("YOLO Model Loaded Successfully")
+        st.markdown("<p style='color:#4ade80; margin:5px 0 0 0;'>🟢 Loaded Successfully</p>", unsafe_allow_html=True)
     except Exception as e:
-        st.error("Model file not found. Ensure 'best.pt' is in the project directory.")
+        st.markdown("<p style='color:#f87171; margin:5px 0 0 0;'>🔴 Model File Missing</p>", unsafe_allow_html=True)
         model = None
-        
-    st.markdown("---")
-    st.subheader("Instructions")
-    st.markdown("""
-    1. Upload a clear image (`JPG`, `JPEG`, or `PNG`).
-    2. Click **Run Detection**.
-    3. Review the detection results and analytics.
-    """)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # Instructions Box
+    st.markdown("<div class='sidebar-card'>", unsafe_allow_html=True)
+    st.markdown("<h4 style='margin:0 0 8px 0; color:#f8fafc;'>Quick Guide</h4>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 0.85rem; color:#94a3b8; margin:0;'>1. Upload an image file.<br>2. Preview image in workspace.<br>3. Click <b>Run Detection</b> for analysis.</p>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # 5. Header Section
 st.markdown("""
-    <div class="main-header">
-        <h1>😷 AI Face Mask Detection System</h1>
-        <p>Automated real-time safety monitoring using YOLO object detection</p>
+    <div class="app-header">
+        <h1>😷 Face Mask Detection System</h1>
+        <p>Automated visual inspection using deep learning technology</p>
     </div>
 """, unsafe_allow_html=True)
 
-# 6. Main Content Area
+# 6. Workspace Area
 if model is not None:
-    uploaded_file = st.file_uploader("Upload Image for Analysis", type=["jpg", "jpeg", "png"])
+    uploaded_file = st.file_uploader("Upload Image File", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
 
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
         
-        # Display layout in two columns
+        # Grid layout for side-by-side view without whitespace
         col1, col2 = st.columns(2)
         
         with col1:
-            st.subheader("Original Image")
+            st.markdown("<h3 style='font-size:1.1rem; color:#cbd5e1;'>Original Image</h3>", unsafe_allow_html=True)
             st.image(image, use_container_width=True)
             
         with col2:
-            st.subheader("Detection Result")
-            detection_placeholder = st.empty()
-            detection_placeholder.info("Click the button below to start detection.")
+            st.markdown("<h3 style='font-size:1.1rem; color:#cbd5e1;'>Detection Workspace</h3>", unsafe_allow_html=True)
+            detection_container = st.empty()
+            detection_container.image(image, caption="Awaiting Detection...", use_container_width=True)
 
-        st.markdown("---")
+        st.markdown("<br>", unsafe_allow_html=True)
         
-        # Detection Trigger
+        # Action Button
         if st.button("Run Mask Detection"):
-            with st.spinner("Analyzing image..."):
+            with st.spinner("Processing image via YOLO..."):
                 img_array = np.array(image.convert("RGB"))
                 results = model(img_array)
                 res_plotted = results[0].plot()
                 
-                # Render result in right column
-                detection_placeholder.image(res_plotted, use_container_width=True)
+                # Replace the image container directly with the result
+                detection_container.image(res_plotted, caption="Processed Output", use_container_width=True)
                 
-                # Render detection analytics
+                # Metrics Row
                 boxes = results[0].boxes
-                total_detections = len(boxes) if boxes is not None else 0
+                total_faces = len(boxes) if boxes is not None else 0
                 
-                st.subheader("Analytics Summary")
+                st.markdown("---")
                 m1, m2 = st.columns(2)
-                m1.metric(label="Total Faces Detected", value=total_detections)
-                m2.metric(label="Detection Status", value="Complete" if total_detections > 0 else "No Faces Found")
+                m1.metric("Total Detected Faces", total_faces)
+                m2.metric("Detection State", "Success" if total_faces > 0 else "No Faces Identified")
+    else:
+        st.info("Please upload an image file using the upload box above to begin.")
