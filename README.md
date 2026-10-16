@@ -1,19 +1,39 @@
-# 😷 Face Mask Detection Web App
+# 😷 Face Mask Detection using YOLOv8 & Streamlit Web App
 
-A computer vision web application built with **YOLOv8** and **Streamlit** to detect face mask compliance in images.
+An end-to-end Computer Vision web application that detects whether individuals are wearing face masks or not in real-time using the **YOLOv8** object detection model.
 
-## 📌 Project Overview
-This application uses a custom-trained YOLOv8 Nano model trained on the Mask-Wearing Dataset from Roboflow to classify faces into two categories:
-* **mask** (Green Bounding Box)
-* **no-mask** (Red Bounding Box)
 ---
 
-## 🔗 Quick Links
+## 🚀 Live Demo & Resources
+*   **Live Streamlit App:** [Access Web Application](https://face-mask-detection-web-application.streamlit.app/)
+*   **Kaggle Notebook:** [View Training & EDA Notebook](https://www.kaggle.com/code/samoura/face-mask-detection-using-yolov8-model)
 
-🔗 **Live Web App:** [Face Mask Detection App] (https://face-mask-detection-web-application.streamlit.app/])
+---
 
-🔗 **Kaggle Notebook:** [Face Mask Detection YOLOv8 Notebook](https://www.kaggle.com/code/samoura/mask-detection/edit/run/349773664)
+## 📌 Project Overview
+This project focuses on building, training, evaluating, and deploying a state-of-the-art object detection model to classify and locate face masks. 
 
+*   **Model Architecture:** YOLOv8 (Nano) by Ultralytics
+*   **Dataset:** Custom dataset managed via Roboflow (`mask` and `no-mask` classes).
+*   **Deployment Framework:** Streamlit
+
+---
+
+## 📊 Model Performance & Metrics
+The model was fine-tuned for 50 epochs on a GPU and achieved strong evaluation results on the test set:
+*   **mAP@50:** ~94.4%
+*   **mAP@50-95:** ~67.8%
+
+---
+
+## 🛠️ Tech Stack & Libraries
+*   **Python**
+*   **Ultralytics YOLOv8** (Object Detection)
+*   **Roboflow** (Dataset Management)
+*   **OpenCV & Matplotlib** (Image Processing & Visualization)
+*   **Pandas & NumPy** (Data Manipulation)
+*   **Streamlit** (Web App Deployment)
+*   **ONNX** (Model Export & Optimization)
 
 ---
 
@@ -24,3 +44,4 @@ This application uses a custom-trained YOLOv8 Nano model trained on the Mask-Wea
 ├── best.pt            # Trained YOLOv8 model weights
 ├── requirements.txt   # Required Python dependencies
 └── README.md          # Project documentation
+└── requirements.txt   
