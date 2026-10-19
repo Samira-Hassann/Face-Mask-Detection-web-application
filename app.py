@@ -142,3 +142,11 @@ else:
                 <p style='font-size: 1.2rem; margin: 0;'>📥 Drag and drop or browse an image above to start</p>
             </div>
         """, unsafe_allow_html=True)
+import torch
+
+# الكود ده هيكشفلك لو الـ GPU شغال ولا رجع للـ CPU
+device = "cuda" if torch.cuda.is_available() else "cpu"
+print(f"Currently running inference on: {device.upper()}")
+
+# وممكن تعرضيها للمستخدم على صفحة الستريملت نفسها كمعلومة تقنية:
+st.write(f"⚙️ Running on: **{device.upper()}**")
